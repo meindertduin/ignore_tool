@@ -1,0 +1,8 @@
+[package]
+name = "ignore"
+version = "0.1.0"
+authors = ["meindertduin"]
+edition = "2018"
+
+[dependencies]
+curl = "0.4.34"
