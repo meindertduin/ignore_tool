@@ -4,6 +4,44 @@ use fmt::write;
 use std::{fmt::{self, Display}, time::Duration};
 
 
+pub fn create_new_ingore(path: &String, args: &Vec<String>){ 
+    let mut client = IgnoreFilesClient::new();
+
+    let client_data = get_ignore_client_data(args);
+
+    for data in client_data {
+        client.add_ignore(data.0.as_str(), data.1);
+    }
+
+    let ignore_request_handlers = client.send_requests();
+    
+    for handler in ignore_request_handlers {
+        let message = String::from_utf8_lossy(&handler.get_ref().buffer);
+        println!("Handler === {}", handler.get_ref().ignore_type);
+        println!("{}", message);
+    }
+}
+
+fn get_ignore_client_data(types: &Vec<String>) -> Vec<(String, IgnoreType)> {
+    let mut client_data: Vec<(String, IgnoreType)> = Vec::new();
+
+    let base_ignore_url = "https://raw.githubusercontent.com/github/gitignore/master/";
+
+    for ignore in types {
+        client_data.push((format!("{}{}{}", base_ignore_url, cap_first_char(ignore.as_str()), ".gitignore"), IgnoreType::Rust));
+    } 
+
+    client_data
+}
+
+fn cap_first_char(s: &str) -> String {
+    let mut c = s.chars();
+    match c.next() {
+        None => String::new(),
+        Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
+    }
+}
+
 struct EasyCollector {
     buffer: Vec<u8>,
     ignore_type: IgnoreType,
@@ -72,20 +110,6 @@ impl Display for IgnoreType {
     }
 }
 
-pub fn create_new_ingore(path: &String, args: &Vec<String>){ 
-    let mut client = IgnoreFilesClient::new();
-    client.add_ignore("https://raw.githubusercontent.com/github/gitignore/master/Rust.gitignore", IgnoreType::Rust);
-    client.add_ignore("https://raw.githubusercontent.com/github/gitignore/master/C.gitignore", IgnoreType::C);
-    let ignore_request_handlers = client.send_requests();
-    
-
-    for handler in ignore_request_handlers {
-        let message = String::from_utf8_lossy(&handler.get_ref().buffer);
-        println!("Handler === {}", handler.get_ref().ignore_type);
-        println!("{}", message);
-    }
-
-}
 
 
 
