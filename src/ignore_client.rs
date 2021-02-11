@@ -1,6 +1,30 @@
 use curl::multi::Multi;
 use curl::{easy::{Easy, Easy2, Handler, WriteError}, multi::Easy2Handle};
 use std::{fmt::{self, Display}, time::Duration};
+use clap::Values;
+
+pub fn get_ignore_client_data(types: Values) -> Vec<IgnoreClientData> {
+    let mut client_data: Vec<IgnoreClientData> = Vec::new();
+
+    let base_ignore_url = "https://raw.githubusercontent.com/github/gitignore/master/";
+
+    for ignore in types 
+    {
+        let cap_ingore_type = cap_first_char(ignore); 
+        if let Some(url) = get_raw_gitignore_url(ignore.to_uppercase().as_str()){
+            client_data.push(IgnoreClientData {
+                url, 
+                ignore_type: cap_ingore_type,
+            });
+        } else {
+            // let the user know that the package could not be found
+            eprintln!("Error: ignore file of type {} could not be found and has not been added to .gitignore", ignore);
+        }
+    } 
+
+    client_data
+}
+
 
 pub struct IgnoreFilesClient {
     multi: Multi,
@@ -70,5 +94,32 @@ pub fn cap_first_char(s: &str) -> String {
     match c.next() {
         None => String::new(),
         Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
+    }
+}
+
+fn get_raw_gitignore_url(ignore_type: &str) -> Option<String> {
+    let root_url = "https://raw.githubusercontent.com/github/gitignore/master/";
+
+    let route = match ignore_type {
+        "C" => Some("C.gitignore"),
+        "C++" => Some("C++.gitignore"),
+        "LUA" => Some("Lua.gitignore"),
+        "Go" => Some("Go.gitignoe"),
+        "NODE" => Some("Node.gitignore"),
+        "OBJECTIVE-C" => Some("Objective-C.gitignore"),
+        "PYTHON" => Some("Pyton.gitignore"),
+        "RUST" => Some("Rust.gitignore"),
+        "LINUX" => Some("community/Linux/Snap.gitignore"),
+        "VUE" => Some("community/JavaScript/Vue.gitignore"),
+        "JETBRAINS" => Some("Global/JetBrains.gitignore"),
+        "VIM" => Some("Global/Vim.gitignore"),
+        "VSCODE" => Some("VisualStudioCode.gitignore"),
+        "VISUALSTUDIO" => Some("VisualStudio.gitignore"),
+        _ => None,
+    };
+
+    match route {
+        Some(value) => Some(format!("{}{}", root_url, value)),
+        None => None,
     }
 }
