@@ -1,3 +1,6 @@
+
+use std::{fs, io::Write};
+
 mod ignore_client;
 
 pub fn create_new_ingore(path: &String, args: &Vec<String>){ 
@@ -11,12 +14,24 @@ pub fn create_new_ingore(path: &String, args: &Vec<String>){
 
     let ignore_request_handlers = client.send_requests();
     
-    for handler in ignore_request_handlers {
-        let message = String::from_utf8_lossy(&handler.get_ref().buffer);
-        println!("Handler === {}", handler.get_ref().ignore_type);
-        println!("{}", message);
+    let mut ignore_file = fs::File::create("dev.txt").unwrap();
+
+
+    for handler in ignore_request_handlers {  
+        match handler.response_code() {
+            Ok(code) => {
+                if code == 200 {
+                    ignore_file.write(&handler.get_ref().buffer).unwrap();
+                } else{
+                    panic!("ignore of type {} could not be found", handler.get_ref().ignore_type)
+                }
+            },
+            Err(err) => panic!("{:?}", err),
+        };
     }
+
 }
+
 
 fn get_ignore_client_data(types: &Vec<String>) -> Vec<ignore_client::IgnoreClientData> {
     let mut client_data: Vec<ignore_client::IgnoreClientData> = Vec::new();

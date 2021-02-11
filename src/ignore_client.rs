@@ -28,12 +28,12 @@ impl IgnoreFilesClient {
         self.easy_handles.push(easy_handle);
     }
 
-    pub fn send_requests(&self) -> &Vec<Easy2Handle<EasyCollector>>{
-       while self.multi.perform().unwrap() > 0 {
+    pub fn send_requests(&mut self) -> &mut Vec<Easy2Handle<EasyCollector>>{
+        while self.multi.perform().unwrap() > 0 {
             self.multi.wait(&mut [], Duration::from_secs(1)).unwrap();
-       } 
+        }
 
-       self.easy_handles.as_ref() 
+        self.easy_handles.as_mut() 
     }
 }
 
