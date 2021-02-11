@@ -1,6 +1,5 @@
-use std::env;
-use ignore::{create_new_ingore, write_existing_ignore};
-use clap::{Arg, App, SubCommand, Values};
+use ignore::{create_new_ingore, write_existing_ignore,};
+use clap::{Arg, App};
 
 fn main() {
     let matches = App::new("ignore")
@@ -34,28 +33,10 @@ fn main() {
         Some(path) => path,
         None => ".",
     };
-
+    
     if let Some(types) = matches.values_of("create") {
         create_new_ingore(path, types);
     } else if let Some(types) = matches.values_of("write") {
         write_existing_ignore(path, types);
     }    
-}
-
-
-struct Config <'a>{
-    mode: &'a String,
-    path: &'a String,
-    args: &'a Vec<String>, 
-}
-
-impl<'a> Config<'a> {
-    fn parse(mode: &'a String, path: &'a String,args: &'a Vec<String>) -> Config<'a>
-    {
-        Config {
-            mode,
-            path,
-            args,
-        }
-    }
 }

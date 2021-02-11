@@ -1,7 +1,6 @@
-use curl::multi::Multi;
-use curl::{easy::{Easy, Easy2, Handler, WriteError}, multi::Easy2Handle};
-use std::{fmt::{self, Display}, time::Duration};
+use curl::{easy::{Easy2, Handler, WriteError}, multi::Easy2Handle, multi::Multi};
 use clap::Values;
+use std::time::Duration;
 
 pub fn get_ignore_client_data(types: Values) -> Vec<IgnoreClientData> {
     let mut client_data: Vec<IgnoreClientData> = Vec::new();
@@ -33,8 +32,6 @@ pub struct IgnoreFilesClient {
 
 impl IgnoreFilesClient {
     pub fn new() -> IgnoreFilesClient {
-        let multi = Multi::new();
-
         let mut multi = Multi::new();
         multi.pipelining(true, true).unwrap();         
 
