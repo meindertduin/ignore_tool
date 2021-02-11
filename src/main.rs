@@ -1,29 +1,47 @@
 use std::env;
-use ignore::create_new_ingore;
+use ignore::{create_new_ingore, write_existing_ignore};
+use clap::{Arg, App, SubCommand, Values};
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    
-    let mode = &args[1];
-    let path = &args[2];
+    let matches = App::new("ignore")
+        .version("0.1")
+        .author("Meindert v D. <meindertvanduin99@gmail.com>")
+        .about("simple cli for creating quick ignore files")
+        .arg(Arg::with_name("create")
+                .short("c")
+                .multiple(true)
+                .long("create")
+                .value_name("IGNORE TYPE")
+                .help("creates new ignore file with privided ignore types")
+                .takes_value(true))
+        .arg(Arg::with_name("write")
+                .short("w")
+                .multiple(true)
+                .long("write")
+                .value_name("IGNORE TYPE")
+                .help("writes to the given ignore file with provided ignore types")
+                .takes_value(true))
+        .arg(Arg::with_name("path")
+                .short("p")
+                .long("path")
+                .value_name("PATH")
+                .help("the path where the ignore file should be writen to or created, defaults to current directory")
+                .takes_value(true))
+        .get_matches();
 
-    let args = Vec::from(&args[3..]);
-    
-    let config = Config::parse(mode, path,&args);
 
-    if config.args.len() <= 0 {
-        panic!("to few arguments given");    
+    let path = match matches.value_of("path") {
+        Some(path) => path,
+        None => ".",
     };
 
-    run(&config);
+    if let Some(types) = matches.values_of("create") {
+        create_new_ingore(path, types);
+    } else if let Some(types) = matches.values_of("write") {
+        write_existing_ignore(path, types);
+    }    
 }
 
-fn run(config: &Config){
-    match config.mode.as_str() {
-        "create" => create_new_ingore(config.path, config.args),
-        _ => panic!("please enter a valid mode"),
-    }
-}
 
 struct Config <'a>{
     mode: &'a String,

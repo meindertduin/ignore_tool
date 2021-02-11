@@ -5,4 +5,5 @@ authors = ["meindertduin"]
 edition = "2018"
 
 [dependencies]
+clap = "2.33.3"
 curl = "0.4.34"

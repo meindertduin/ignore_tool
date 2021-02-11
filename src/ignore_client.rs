@@ -38,6 +38,7 @@ impl IgnoreFilesClient {
 }
 
 
+
 pub struct EasyCollector {
     pub buffer: Vec<u8>,
     pub ignore_type: String,
