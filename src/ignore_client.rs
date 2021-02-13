@@ -5,8 +5,6 @@ use std::time::Duration;
 pub fn get_ignore_client_data(types: Values) -> Vec<IgnoreClientData> {
     let mut client_data: Vec<IgnoreClientData> = Vec::new();
 
-    let base_ignore_url = "https://raw.githubusercontent.com/github/gitignore/master/";
-
     for ignore in types 
     {
         let cap_ingore_type = cap_first_char(ignore); 
