@@ -1,5 +1,5 @@
 use ignore::{create_new_ingore, write_existing_ignore,};
-use clap::{Arg, App};
+use clap::{App, Arg, ArgMatches};
 
 fn main() {
     let matches = App::new("ignore")
@@ -28,7 +28,11 @@ fn main() {
                 .takes_value(true))
         .get_matches();
 
+    run(matches);
+}
 
+
+fn run(matches: ArgMatches) { 
     let path = match matches.value_of("path") {
         Some(path) => path,
         None => ".",
@@ -39,4 +43,5 @@ fn main() {
     } else if let Some(types) = matches.values_of("write") {
         write_existing_ignore(path, types);
     }    
+    
 }
